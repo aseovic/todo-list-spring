@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2021, 2022 Oracle and/or its affiliates.
+  Licensed under the Universal Permissive License v 1.0 as shown at
+  https://oss.oracle.com/licenses/upl.
+-->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.7.1</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.oracle.coherence.examples</groupId>
+  <artifactId>todo-list-spring-server</artifactId>
+  <version>22.06.1</version>
+
+  <name>todo-list-spring-server</name>
+  <description>Spring Boot implementation of Coherence To Do List demo</description>
+
+  <properties>
+    <java.version>11</java.version>
+    <maven.minimum.version>3.6.0</maven.minimum.version>
+
+    <!-- Dependencies -->
+    <coherence.groupId>com.oracle.coherence.ce</coherence.groupId>
+    <coherence.version>${project.version}</coherence.version>
+
+    <coherence-spring.version>3.3.0</coherence-spring.version>
+
+    <graphql-java-datetime.version>4.1.0</graphql-java-datetime.version>
+    <graphql-java-extended-scalars.version>18.1</graphql-java-extended-scalars.version>
+    <graphql-spring-boot-starter.version>1.0.0</graphql-spring-boot-starter.version>
+
+    <!-- Plugins -->
+    <plugin.exec.version>3.0.0</plugin.exec.version>
+    <plugin.jib.version>3.2.1</plugin.jib.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.coherence.spring</groupId>
+      <artifactId>coherence-spring-boot-starter</artifactId>
+      <version>${coherence-spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.coherence.spring</groupId>
+      <artifactId>coherence-spring-data</artifactId>
+      <version>${coherence-spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${coherence.groupId}</groupId>
+      <artifactId>coherence-json</artifactId>
+      <version>${coherence.version}</version>
+    </dependency>
+
+    <!-- GraphLQ -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-graphql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.graphql-java</groupId>
+      <artifactId>graphql-java-extended-scalars</artifactId>
+      <version>${graphql-java-extended-scalars.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.zhokhov.graphql</groupId>
+      <artifactId>graphql-java-datetime</artifactId>
+      <version>${graphql-java-datetime.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>${plugin.exec.version}</version>
+        <configuration>
+          <executable>java</executable>
+          <arguments>
+            <argument>-classpath</argument>
+            <classpath/>
+            <argument>
+              com.oracle.coherence.examples.todo.server.Application
+            </argument>
+          </arguments>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+    <!--
+      Creates a single architecture image (based on the build machine architecture)
+      and publishes it to a local Docker daemon
+    -->
+    <profile>
+      <id>docker</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-maven-plugin</artifactId>
+            <version>${plugin.jib.version}</version>
+            <configuration>
+              <from>
+                <image>
+                  gcr.io/distroless/java11-debian11
+                </image>
+              </from>
+              <to>
+                <image>ghcr.io/coherence-community/${project.artifactId}</image>
+                <tags>
+                  <tag>${project.version}</tag>
+                </tags>
+              </to>
+              <container>
+                <ports>
+                  <port>3001</port>
+                  <port>3002</port>
+                </ports>
+                <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+              </container>
+              <containerizingMode>packaged</containerizingMode>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>dockerBuild</goal>
+                </goals>
+                <phase>package</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

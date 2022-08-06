@@ -1,0 +1,35 @@
+"Custom: Built-in java.math.BigInteger via Scalars.GraphQLBigInteger"
+scalar BigInteger
+
+"Custom: An RFC-3339 compliant DateTime Scalar provided by graphql-datetime-spring-boot-starter."
+scalar LocalDateTime
+
+type Mutation {
+    "Create a task with the given description"
+    createTask(description: String): Task
+    "Remove all completed tasks and return the tasks left"
+    deleteCompletedTasks: [Task]
+    "Delete a task and return the deleted task details"
+    deleteTask(id: String): Task
+    "Update task description"
+    updateDescription(id: String, description: String): Task
+    "Update task completion status"
+    updateCompletionStatus(id: String, completed: Boolean): Task
+}
+
+type Query {
+    "Find a given task using the task id"
+    findTask(id: String): Task
+    "Query tasks and optionally specify only completed"
+    tasks(completed: Boolean): [Task]
+    hello: String
+}
+
+type Task {
+    completed: Boolean
+    createdAt: BigInteger!
+    createdAtDate: LocalDateTime
+    description: String
+    id: String
+}
+

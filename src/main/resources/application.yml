@@ -1,0 +1,37 @@
+debug: false
+
+server:
+  port: 3001
+
+spring:
+  application:
+    name: todo-list-spring-server
+  graphql:
+    cors:
+      allowed-origins: "*"
+
+coherence:
+  cluster: todo-list
+  role: SpringApp
+  serializer: java
+  service:
+    name: Tasks
+  metrics:
+    http:
+      enabled: true
+      port: 3002
+  proxy:
+    enabled: false
+  topic:
+    enabled: false
+
+logging:
+  level:
+    root: warn
+    Coherence: info
+    com.oracle.coherence.examples.todo.server: info
+    com.oracle.coherence.spring: info
+    org.springframework: warn
+    org.springframework.boot: info
+    org.springframework.web: warn
+    org.springframework.boot.autoconfigure.logging: warn
