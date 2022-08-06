@@ -7,9 +7,9 @@
 package com.oracle.coherence.examples.todo.server;
 
 import graphql.ErrorClassification;
+import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
-
 import java.util.List;
 
 /**
@@ -23,7 +23,7 @@ public class TaskNotFoundException
     /**
      * Create the exception.
      *
-     * @param message reason for the exception.
+     * @param taskId id of the task that couldn't be found
      */
     public TaskNotFoundException(String taskId)
         {
@@ -39,6 +39,6 @@ public class TaskNotFoundException
         @Override
         public ErrorClassification getErrorType()
             {
-            return null;
+            return ErrorType.DataFetchingException;
             }
     }
