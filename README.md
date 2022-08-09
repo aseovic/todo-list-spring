@@ -1,47 +1,54 @@
-# Coherence To Do List Example Application for Spring Boot
+# Course materials for Coherence To Do List (Helidon) workshop
 
-## Build Instructions
+>This is a complete, final implementation of the application created during the workshop.
+ > 
+ >To switch to the starting point for the workshop, check out the `start` branch:
+ > 
+ >```bash
+ > git checkout start
+ > ```
+ >        
+>Open the project in the IDE of your choice, and follow the [lab instructions](https://aseovic.medium.com/coherence-to-do-list-spring-8d5c268556e0).  
 
-Run the following from the project root directory:
-
-```bash
-cd java/spring-server
-mvn clean package -s ../.mvn/settings.xml
-```
-
-## Running the Example
-
-```bash
-java -jar target/todo-list-spring-server-22.06.jar
-```
-
-The Coherence Spring implementation comes with 2
-[TaskService](https://github.com/coherence-community/todo-list-example/blob/master/java/spring-server/src/main/java/com/oracle/coherence/examples/todo/server/service/TaskService.java) implementations:
-
-- [SpringDataTaskService](https://github.com/coherence-community/todo-list-example/blob/master/java/spring-server/src/main/java/com/oracle/coherence/examples/todo/server/service/SpringDataTaskService.java)
-- [CoherenceTaskService](https://github.com/coherence-community/todo-list-example/blob/master/java/spring-server/src/main/java/com/oracle/coherence/examples/todo/server/service/CoherenceTaskService.java)
-
-By default, the Spring Data-based implementation is used, but you can activate the native
-Coherence implementation by enabling the `Coherence` Spring Boot profile:
+## Instructions
+  
+### Build the project
 
 ```bash
-java -jar target/todo-list-spring-server-22.06.jar --spring.profiles.active=coherence
+mvn clean package
 ```
+
+### Run the Application
+
+```bash  
+mvn exec:exec
+```
+### Build a Docker Image
+
+```bash
+mvn clean install
+mvn package -P docker 
+```
+
+### Run the Docker Container
+
+```bash
+docker run -d -p 3001:3001 -P 3002:3002 ghcr.io/coherence-community/todo-list-spring-server
+```
+
+> NOTE: `3001` is the HTTP port, and `3002` is the metrics port.
 
 ### Access the Web UI
 
-Access via http://localhost:3000/
+Access via http://localhost:3001/
 
 ![To Do List - React Client](assets/react-client.png)
 
 ### Query the GraphQL Endpoint
 
-The GraphQL Endpoint is available at: `http://localhost:3001/graphql`. Use one of the following tools to interact wih it:
+The GraphQL Endpoint is available at http://localhost:3001/graphiql.html.
 
-- [GraphiQL](https://github.com/graphql/graphiql)
-- [Insomnia](https://insomnia.rest/download)
-
-For instance, retrieve a collection of tasks using the following query:
+To retrieve a collection of tasks, use the following query:
 
 ```graphql
 query {
@@ -54,87 +61,24 @@ query {
   }
 }
 ```
-
-To create a task:
-
+ 
+To create a new task, type:
 ```graphql
 mutation {
-    createTask(description: "My awesome Task!") {
-        id
-        description
-        createdAt
-        completed
-    }
-}
-
-```
-
-To update a task:
-
-```graphql
-mutation {
-  updateTask(id: "123456", completed: true, description: "updated") {
-    completed
-    description
-  }
-}
-```
-
-In order to delete a task:
-
-```graphql
-mutation {
-  deleteTask(id: "123456") {
+  createTask(description: "My GraphQL Task") {
     id
     description
     completed
     createdAt
     createdAtDate
-  }
+  } 
 }
 ```
 
-In order to delete completed tasks:
+## References
 
-```graphql
-mutation {
-  deleteCompletedTasks {
-      id
-      description
-      completed
-      createdAt
-      createdAtDate
-  }
-}
-```
+* [Coherence CE](https://coherence.community/)
+* [Spring](https://spring.io/)
 
-For more information on GraphQL and using it with the To Do List example, [please see the here](../graphql.md).
 
-## Run with Docker
 
-Build the image:
-
-```bash
-mvn clean package -Pdocker
-```
-
-Double-check the image is there:
-
-```bash
-docker images
-```
-
-You should see the image listed:
-
-```bash
-REPOSITORY                                            TAG         IMAGE ID       CREATED          SIZE
-ghcr.io/coherence-community/todo-list-spring-server   22.06       418e5870adc9   5 minutes ago    275MB
-ghcr.io/coherence-community/todo-list-spring-server   latest      418e5870adc9   5 minutes ago    275MB
-…
-```
-
-Run the docker images and binding to ports `3000` and port `1408`:
-
-```bash
-docker run -p 3000:3000 -p 1408:1408 ghcr.io/coherence-community/todo-list-spring-server:latest
-```
