@@ -24,13 +24,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 @RequestMapping(path="/api/tasks",
                 produces = MediaType.APPLICATION_JSON_VALUE)
-public class ToDoListController
+public class ToDoListRestController
     {
     private final TaskService taskService;
 
     private final SseService sseService;
 
-    public ToDoListController(TaskService taskService, SseService sseService)
+    public ToDoListRestController(TaskService taskService, SseService sseService)
         {
         this.taskService = taskService;
         this.sseService = sseService;
@@ -66,21 +66,21 @@ public class ToDoListController
         }
 
     @GetMapping
-    public Collection<Task> getTasks(@RequestParam(defaultValue = "false") boolean completed)
+    public Collection<Task> getTasks(@RequestParam Boolean completed)
         {
-        return taskService.findAll(completed);
+        return taskService.findTasks(completed);
         }
 
     @PostMapping
-    public void createTask(@RequestBody Task task)
+    public Task createTask(@RequestBody Task task)
         {
-        taskService.save(new Task(task.getDescription()));
+        return taskService.createTask(task.getDescription());
         }
 
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable String id)
+    public Task deleteTask(@PathVariable String id)
         {
-        taskService.removeById(id);
+        return taskService.deleteTask(id);
         }
 
     @DeleteMapping
@@ -106,7 +106,7 @@ public class ToDoListController
             }
 
         return result == null
-               ? taskService.find(id)
+               ? taskService.findTask(id)
                : result;
         }
 

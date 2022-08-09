@@ -13,15 +13,15 @@ import java.util.Collection;
  * {@link com.oracle.coherence.examples.todo.server.TaskRepository}.
  */
 public interface TaskService {
-	Collection<Task> findAll(boolean completed);
+	Collection<Task> findTasks(Boolean completed);
 
-	Task find(String id);
+	Task findTask(String id);
 
-	void save(Task task);
+	Task createTask(String description);
 
-	void removeById(String id);
+	Task deleteTask(String id);
 
-	void deleteCompletedTasks();
+	boolean deleteCompletedTasks();
 
 	Task updateDescription(String id, String description);
 

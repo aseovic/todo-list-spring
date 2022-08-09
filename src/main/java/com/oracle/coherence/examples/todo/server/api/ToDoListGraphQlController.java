@@ -14,12 +14,12 @@ import com.oracle.coherence.examples.todo.server.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class TaskMutationController
+public class ToDoListGraphQlController
     {
-
     @Autowired
     private TaskService taskService;
 
@@ -30,20 +30,40 @@ public class TaskMutationController
     @MutationMapping
     public Task createTask(@Argument String description)
         {
-        final Task task = new Task(description);
-        taskService.save(task);
-        return task;
+        return taskService.createTask(description);
         }
 
     /**
-     * Remove all completed tasks and return the tasks left.
-     * @return the remaining uncompleted tasks
+     * Find a single task by the provided id.
+     *
+     * @param id the id of the task to find
+     * @return the retrieved task
+     */
+    @QueryMapping
+    public Task findTask(@Argument String id)
+        {
+        return taskService.findTask(id);
+        }
+
+    /**
+     * Retrieve tasks based on completion status.
+     * @param completed if true return only completed tasks
+     * @return a collection of tasks
+     */
+    @QueryMapping
+    public Collection<Task> tasks(@Argument Boolean completed)
+        {
+        return taskService.findTasks(completed);
+        }
+
+    /**
+     * Remove all completed tasks.
+     * @return {@code true} if any tasks have been removed
      */
     @MutationMapping
-    public Collection<Task> deleteCompletedTasks()
+    public Boolean deleteCompletedTasks()
         {
-        taskService.deleteCompletedTasks();
-        return taskService.findAll(false);
+        return taskService.deleteCompletedTasks();
         }
 
     /**
@@ -53,9 +73,7 @@ public class TaskMutationController
     @MutationMapping
     public Task deleteTask(@Argument String id)
         {
-        final Task task = taskService.find(id);
-        taskService.removeById(id);
-        return task;
+        return taskService.deleteTask(id);
         }
 
     /**
@@ -73,8 +91,9 @@ public class TaskMutationController
      * @return the updated task
      */
     @MutationMapping
-    public Task updateCompletionStatus(@Argument String id, @Argument boolean completed)
+    public Task updateCompletionStatus(@Argument String id, @Argument Boolean completed)
         {
         return taskService.updateCompletionStatus(id, completed);
         }
     }
+

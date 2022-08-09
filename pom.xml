@@ -36,7 +36,6 @@
 
     <graphql-java-datetime.version>4.1.0</graphql-java-datetime.version>
     <graphql-java-extended-scalars.version>18.1</graphql-java-extended-scalars.version>
-    <graphql-spring-boot-starter.version>1.0.0</graphql-spring-boot-starter.version>
 
     <!-- Plugins -->
     <plugin.exec.version>3.0.0</plugin.exec.version>
@@ -47,11 +46,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.oracle.coherence.spring</groupId>
@@ -91,12 +85,6 @@
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-webflux</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 

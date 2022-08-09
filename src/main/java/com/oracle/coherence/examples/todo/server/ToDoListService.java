@@ -8,14 +8,12 @@ package com.oracle.coherence.examples.todo.server;
 
 import com.tangosol.util.Filter;
 import com.tangosol.util.Filters;
+import java.util.Map;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 
 /**
@@ -23,12 +21,9 @@ import java.util.Collection;
  * for working with {@link Task tasks}.
  */
 @Service
-@Profile("!coherence")
 public class ToDoListService
         implements TaskService
     {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ToDoListService.class);
-
     private final TaskRepository tasks;
 
     public ToDoListService(TaskRepository tasks)
@@ -37,17 +32,24 @@ public class ToDoListService
         }
 
     @Override
-    public Collection<Task> findAll(boolean completed)
+    public Collection<Task> findTasks(Boolean completed)
         {
-        final Filter<Task> filter = !completed
+        final Filter<Task> filter = completed == null
                                     ? Filters.always()
-                                    : Filters.equal(Task::getCompleted, true);
+                                    : Filters.equal(Task::getCompleted, completed);
 
         return tasks.getAllOrderedBy(filter, Task::getCreatedAt);
         }
 
     @Override
-    public Task find(String id)
+    public Task createTask(String description)
+        {
+        Assert.notNull(description, "The description is required.");
+        return tasks.save(new Task(description));
+        }
+
+    @Override
+    public Task findTask(String id)
         {
         Assert.hasText(id, "The Task Id must not be null or empty.");
         return tasks.findById(id)
@@ -55,23 +57,18 @@ public class ToDoListService
         }
 
     @Override
-    public void save(Task task)
-        {
-        Assert.notNull(task, "The task must not be null.");
-        tasks.save(task);
-        }
-
-    @Override
-    public void removeById(String id)
+    public Task deleteTask(String id)
         {
         Assert.hasText(id, "The Task Id must not be null or empty.");
-        tasks.deleteById(id);
+        Map<String, Task> mapRemoved = tasks.deleteAllById(Set.of(id), true);
+        return Optional.ofNullable(mapRemoved.get(id))
+                .orElseThrow(() -> new TaskNotFoundException(id));
         }
 
     @Override
-    public void deleteCompletedTasks()
+    public boolean deleteCompletedTasks()
         {
-        tasks.deleteAll(Filters.equal(Task::getCompleted, true), false);
+        return tasks.deleteAll(Filters.isTrue(Task::getCompleted));
         }
 
     /**
@@ -108,11 +105,5 @@ public class ToDoListService
         return Optional
                 .ofNullable(task)
                 .orElseThrow(() -> new TaskNotFoundException(id));
-        }
-
-    @PostConstruct
-    public void init()
-        {
-        LOGGER.info("Using SpringDataTaskService.");
         }
     }
