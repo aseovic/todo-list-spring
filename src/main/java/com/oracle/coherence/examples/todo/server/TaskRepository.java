@@ -12,7 +12,7 @@ import com.oracle.coherence.spring.data.repository.CoherenceRepository;
 /**
  * A {@code Coherence}-based Spring Data repository for working with {@link Task tasks}.
  */
-@CoherenceMap("tasks")
 public interface TaskRepository
-        extends CoherenceRepository<Task, String> {
-}
+    {
+    // TODO: necessary annotations and extends clause
+    }
